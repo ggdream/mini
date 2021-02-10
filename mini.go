@@ -11,6 +11,18 @@ func New(tokens []string) *result {
 	}
 }
 
+func Raw(tokens []string) map[string]interface{} {
+	results := make(map[string]interface{})
+
+	rest, flag := parse(tokens)
+	for k, v := range flag {
+		results[k] = v
+	}
+	results["_"] = rest
+
+	return results
+}
+
 func parse(tokens []string) ([]string, map[string]string) {
 	rest := make([]string, 0)
 	flag := make(map[string]string)
