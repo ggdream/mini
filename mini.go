@@ -3,6 +3,7 @@ package mini
 import "strings"
 
 
+
 func New(tokens []string) *result {
 	rest, flag := parse(tokens)
 	return &result{
@@ -11,6 +12,7 @@ func New(tokens []string) *result {
 	}
 }
 
+// Deprecated: Will be removed when the package is published the release version.
 func Raw(tokens []string) map[string]interface{} {
 	results := make(map[string]interface{})
 
@@ -23,18 +25,20 @@ func Raw(tokens []string) map[string]interface{} {
 	return results
 }
 
-func parse(tokens []string) ([]string, map[string]string) {
+
+func includePrefix(token string) bool { return strings.HasPrefix(token, "-") || strings.HasPrefix(token, "--") }
+
+func parse(tokens []string) ([]string, map[string]interface{}) {
 	rest := make([]string, 0)
-	flag := make(map[string]string)
+	flag := make(map[string]interface{})
 
 	for i := 0; i < len(tokens); i++ {
-		if strings.HasPrefix(tokens[i], "-") || strings.HasPrefix(tokens[i], "--") {
-			if i == len(tokens) - 1 {
-				flag[tokens[i]] = ""
+		if includePrefix(tokens[i]) {
+			if i == len(tokens) - 1 || includePrefix(tokens[i + 1]) { // the arg that is the last or includes prefix `-`, `--`.
+				flag[tokens[i]] = true
 			} else {
 				flag[tokens[i]] = tokens[i+1]
-				i += 1
-				continue
+				i++
 			}
 		} else {
 			rest = append(rest, tokens[i])
